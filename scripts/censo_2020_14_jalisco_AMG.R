@@ -740,6 +740,13 @@ gg +
   # add the theme
   theme_map() 
 
+# table(datitos_factor$PC1_q)
+# datitos_factor$estrato=factor(datitos_factor$PC1_q,
+#                           levels = c("-6.1 – -1.5","-1.5 – -0.2","-0.2 – 0.6","0.6 – 1.5","1.5 – 7.6"),
+#                           labels = c("Medio Alto/Alto", "Medio", "Medio Bajo", "Bajo", "Muy Bajo"))
+# table(datitos_factor$estrato)
+
+#saveRDS(datitos_factor, file = "www/datitos_factor_gdl.rds")
 
 
 
@@ -922,6 +929,7 @@ pal <- colorFactor(palette = "plasma",
                    domain = datitos_factor_mza$PC1_q,
                    rev = F,
                    na.color = "#F5F5F3")
+
 
 
 

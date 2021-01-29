@@ -1,0 +1,94 @@
+---
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+##############
+#Configuración
+#rm(list = ls())
+
+```
+
+
+```{r, include = FALSE, message=FALSE, warning=FALSE}
+library(pacman)
+# Abrimos las paqueterías con un sólo comando:
+p_load(haven, readr, readxl, ggplot2, shiny, tidyverse, knitr,
+       gmodels,foreign,expss,fishualize,leaflet,plotly,wesanderson,data.table)
+
+##############
+#Paqueterías para mapear
+library(sf)
+p_load(rstudioapi, lintr, raster, viridis, cowplot, rmarkdown, leaflet)
+
+```
+
+
+
+
+```{r include = FALSE}
+datitos_factor<- readRDS(file = "/Users/macsernst/Documents/Data Science/Repos/Gatitos/2021A/censo_2020/www/datitos_factor_gdl.rds")
+
+pal <- colorFactor(palette = "plasma",
+                   domain = datitos_factor$PC1_q,
+                   rev = F,
+                   na.color = "#F5F5F3")
+
+datitos_factor$estrato=factor(datitos_factor$PC1_q,
+                          levels = c("-6.1 – -1.5","-1.5 – -0.2","-0.2 – 0.6","0.6 – 1.5","1.5 – 7.6"),
+                          labels = c("Medio Alto/Alto", "Medio", "Medio Bajo", "Bajo", "Muy Bajo"))
+
+
+label <- paste0("AGEB: ", datitos_factor$CVE_AGEB)
+popup <- paste0("<b>Alcaldía: </b>", datitos_factor$NOM_MUN, "<br>",
+                "<b>AGEB: </b>", datitos_factor$CVE_AGEB, "<br>",
+                "<b>Estrato: </b>", datitos_factor$estrato, "<br>",
+                "<b>Valor índice: </b>", prettyNum(datitos_factor$PC1, digits=4), "<br>")
+
+```
+
+## Índice de estratificación social de Área Metropolitana de Guadalajara, 2020:
+**Con base en método de estratficación usado acá: bit.ly/3qTpz6B**
+
+Este mapa muestra el resultado de explorar datos del Censo de Población y Vivienda 2020, y el cálculo del índice de estratificación social con el método de componentes principales, utilizando cinco distintas variables detalladas en el documento referido arriba. 
+
+
+```{r map, echo=FALSE}
+
+
+
+
+leaflet(data = datitos_factor, options = leafletOptions(minZoom = 5)) %>%
+  setMaxBounds(lng1 = -103.55, lat1 = 20.45, lng2 = -103.15, lat2 = 20.83) %>%
+  addProviderTiles("OpenStreetMap.Mapnik", group = "Toner") %>% 
+  #Estrato social
+  addPolygons(
+    label = label,
+    popup = popup,
+    weight = .6,
+    color = "white",
+    fillColor = ~pal(PC1_q),
+    fillOpacity = 0.5,
+    #color = "#939486",
+    opacity = 0.7,
+    group = "Estrato Social",
+    highlightOptions = 
+      highlightOptions(
+        color = "black", weight = 4, bringToFront = TRUE),
+  ) %>% 
+  addLegend("bottomright", pal = pal, values = ~PC1_q,
+            title = "Puntaje en índice",
+            #labFormat = labelFormat(prefix = "$"),
+            opacity = 1
+  )
+
+
+
+  
+
+```
+
+Fuente: Elaboración de Máximo E. Jaramillo-Molina con datos de CPV-2020.
+
